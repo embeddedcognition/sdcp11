@@ -196,6 +196,17 @@ int main() {
   	map_waypoints_dy.push_back(d_y);
   }
 
+  //check to ensure file was read in correctly
+  std::cout << "map_waypoints_s size: " << map_waypoints_s.size() << std::endl;
+  std::cout << "map_waypoints_x size: " << map_waypoints_x.size() << std::endl;
+  std::cout << "map_waypoints_y size: " << map_waypoints_y.size() << std::endl;
+
+  if ((map_waypoints_s.size() == 0) || (map_waypoints_x.size() == 0) || (map_waypoints_y.size() ==0))
+  {
+      std::cout << "Error: Map file not read in correctly...exiting." << std::endl;
+      exit(1);
+  }
+
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -238,15 +249,32 @@ int main() {
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 
+          	//lane width = 4 meters
+          	const double lane_width = 4;
+          	//we want to stay in the middle of the middle lane
+          	const double lane_location_factor = 1.5;
+          	//start position of car = middle lane and we want to stick there for now, since our way points are located in the middle of the road at the
+          	//double yellow line we count in half increments until we get to the center of the second (middle) lane which would be 1.5 (one would be the first whole
+          	//lane and since we want to be in the middle of the second (middle) lane we want our lane location factor value to be at the halfway mark (0.5 of that lane)...1 + 0.5 = 1.5,
+          	//we know that the lanes are 4 meters wide so to compute the d value that will put us in the middle of the middle lane we multiply the lane
+          	//width with the lane location factor, which gives us 6
+          	double next_car_d = lane_width * lane_location_factor;
 
-          	//go in straight line
+          	//go forward and stay in current lane
           	double dist_inc = 0.5;
-          	for(int i = 0; i < 50; i++)
+          	for (int i = 0; i < 50; i++)
           	{
-          	    next_x_vals.push_back(car_x+(dist_inc*i)*cos(deg2rad(car_yaw)));
-          	    next_y_vals.push_back(car_y+(dist_inc*i)*sin(deg2rad(car_yaw)));
-          	}
+          	    //compute new s & d values
+          	    //we add 1 to i as we're starting at zero index and the first next_car_s value would be the same as car_s and we'd fail to move
+          	    double next_car_s = car_s + (dist_inc * (i + 1));
 
+          	    //convert the s and d values into an x/y coordinate
+          	    vector<double> xy = getXY(next_car_s, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+
+                //push the new x/y point onto the vectors that go back to the simulator
+          	    next_x_vals.push_back(xy[0]);
+          	    next_y_vals.push_back(xy[1]);
+          	}
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
           	msgJson["next_x"] = next_x_vals;

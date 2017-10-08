@@ -1,3 +1,3 @@
 #!/bin/bash
-
-./build/path_planning
+cd build
+./path_planning
