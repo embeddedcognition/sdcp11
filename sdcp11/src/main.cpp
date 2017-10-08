@@ -250,16 +250,61 @@ int main() {
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 
+          	//indicates the lane we want to be in (left = 0, middle = 1, right = 2)
+          	int target_lane = 1;
+          	//define a reference velocity that acts as the speed we want to hover around but not exceed
+          	double reference_velocity = 49.5;
+          	//capture the size of the previous set of path points that were not reached in the last iteration (the remaining points at the end of the previous plan)
+          	int previous_path_size = previous_path_x.size();
+
+          	//create a list of widely spaced (x, y) anchor points, evenly spaced apart at 30 meters
+          	//we'll interpolate these points using the spline library to fill in the gaps at the spacing
+          	//we need to maintain our reference velocity (remember the spacing determines acceleration)
+          	vector<double> anchor_points_x;
+          	vector<double> anchor_points_y;
+
+          	//establish reference x, y, yaw states
+          	//on the first iteration we'll not have a previous set of path points to extend upon so we need to start with the vehicle's current location
+          	double reference_x = car_x;
+          	double reference_y = car_y;
+          	double reference_yaw = deg2rad(car_yaw);
+
+          	//if the previous path size contains less then 2 points, we'll need to use the vehicle's position as a starting reference
+          	if (previous_path_size < 2)
+          	{
+          	    //compute two anchor points (the vehicle's current position and a point before that) to use since we don't have a previous path to look at
+          	    //we use the vehicle's yaw angle to ensure the previous point is on the same line as the vehicle's angle
+          	    double previous_car_x = car_x - cos(car_yaw);
+          	    double previous_car_y = car_y - sin(car_yaw);
+          	    //add x values
+          	    anchor_points_x.push_back(car_x);
+          	    anchor_points_x.push_back(previous_car_x);
+          	    //add y values
+          	    anchor_points_x.push_back(car_y);
+          	    anchor_points_x.push_back(previous_car_y);
+          	}
+          	else //use previous path's end point as starting reference
+          	{
+          	    //redefine reference state as previous path's end point
+          	    reference_x = previous_path_x[previous_path_size - 1];
+          	    reference_y = previous_path_y[previous_path_size - 1];
+
+
+
+          	}
+
+
           	//lane width = 4 meters
           	const double lane_width = 4;
-          	//we want to stay in the middle of the middle lane
-          	const double lane_location_factor = 1.5;
-          	//start position of car = middle lane and we want to stick there for now, since our way points are located in the middle of the road at the
-          	//double yellow line we count in half increments until we get to the center of the second (middle) lane which would be 1.5 (one would be the first whole
-          	//lane and since we want to be in the middle of the second (middle) lane we want our lane location factor value to be at the halfway mark (0.5 of that lane)...1 + 0.5 = 1.5,
-          	//we know that the lanes are 4 meters wide so to compute the d value that will put us in the middle of the middle lane we multiply the lane
-          	//width with the lane location factor, which gives us 6
-          	double next_car_d = lane_width * lane_location_factor;
+          	//we want to stay in the middle of the lane we're in, which is 2 meters in from the lane's edge (or half of the lane width)
+          	const double target_location_in_lane = lane_width / 2;
+          	//our waypoints are located in the middle of the road at the double yellow line, we always want to be in the center of whichever lane
+          	//we happen to be in, so starting in center of the left-most lane (2 meters to the right of the waypoint location) we add our target lane
+          	//multiplied by our lane width and this gives us our d value, how many meters from the waypoint we want to be, for example, to be in the middle
+          	//lane, we start from the center of the left lane (2 meters to the left of the waypoint) and add (4 * 1), 4 being the lane width and 1 being
+          	//our target lane, this means our d value will be 6, we need the center of our vehicle to be 6 meters to the left of the waypoint for us to
+          	//be in the center of the middle lane
+          	double next_car_d = target_location_in_lane + (lane_width * target_lane);
 
           	//go forward and stay in current lane
           	double dist_inc = 0.5;
