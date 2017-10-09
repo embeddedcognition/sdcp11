@@ -276,23 +276,30 @@ int main() {
           	    //we use the vehicle's yaw angle to ensure the previous point is on the same line as the vehicle's angle
           	    double previous_car_x = car_x - cos(car_yaw);
           	    double previous_car_y = car_y - sin(car_yaw);
-          	    //add x values
-          	    anchor_points_x.push_back(car_x);
+          	    //add x values (spline requires that points are sorted)
           	    anchor_points_x.push_back(previous_car_x);
-          	    //add y values
-          	    anchor_points_x.push_back(car_y);
-          	    anchor_points_x.push_back(previous_car_y);
+          	    anchor_points_x.push_back(car_x);
+          	    //add y values (spline requires that points are sorted)
+          	    anchor_points_y.push_back(previous_car_y);
+          	    anchor_points_y.push_back(car_y);
           	}
           	else //use previous path's end point as starting reference
           	{
           	    //redefine reference state as previous path's end point
           	    reference_x = previous_path_x[previous_path_size - 1];
           	    reference_y = previous_path_y[previous_path_size - 1];
-
-
-
+          	    //also get second-to-last previous path point and then compute reference yaw based on them
+          	    double previous_reference_x = previous_path_x[previous_path_size - 2];
+          	    double previous_reference_y = previous_path_y[previous_path_size - 2];
+          	    reference_yaw = atan2((reference_y - previous_reference_y), (reference_x - previous_reference_x));
+          	    //use the two points that make the path tangent to the previous path's end point
+          	    //add x values (spline requires that points are sorted)
+          	    anchor_points_x.push_back(previous_reference_x);
+          	    anchor_points_x.push_back(reference_x);
+          	    //add y values (spline requires that points are sorted)
+          	    anchor_points_y.push_back(previous_reference_y);
+          	    anchor_points_y.push_back(reference_y);
           	}
-
 
           	//lane width = 4 meters
           	const double lane_width = 4;
@@ -306,6 +313,47 @@ int main() {
           	//be in the center of the middle lane
           	double next_car_d = target_location_in_lane + (lane_width * target_lane);
 
+          	//for our future path, we now plot 3 points into the future and use spline to fill in the gaps and allow us to ensure
+          	//we maintain our target velocity, these 3 points are space 30 meters apart
+
+          	//convert the s and d values into an x/y coordinate
+          	vector<double> next_xy_30 = getXY(car_s + 30, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          	vector<double> next_xy_60 = getXY(car_s + 60, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          	vector<double> next_xy_90 = getXY(car_s + 90, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+
+          	//push the new x/y points onto the vectors that go back to the simulator
+          	//x (spline requires that points are sorted)
+          	next_x_vals.push_back(next_xy_30[0]);
+          	next_x_vals.push_back(next_xy_60[0]);
+          	next_x_vals.push_back(next_xy_90[0]);
+          	//y (spline requires that points are sorted)
+          	next_y_vals.push_back(next_xy_30[1]);
+          	next_y_vals.push_back(next_xy_60[1]);
+          	next_y_vals.push_back(next_xy_90[1]);
+
+          	//conduct translation and rotation of all path points to simplify future steps
+          	//the points are being transformed to the vehicle's perspective
+          	for (int i = 0; i < anchor_points_x.size(); i++)
+          	{
+          	    //this allows us to center the car at the origin (x = 0, y = 0)
+          	    //translate (center the coordinates)
+          	    double translated_x = anchor_points_x[i] - reference_x;
+          	    double translated_y = anchor_points_y[i] - reference_y;
+          	    //this allows us to make yaw zero
+          	    //rotate (counter-clockwise, i.e., yaw is negative)
+          	    anchor_points_x[i] = (translated_x * cos(-reference_yaw)) - (translated_y * sin(-reference_yaw));
+          	    anchor_points_x[i] = (translated_x * sin(-reference_yaw)) + (translated_y * cos(-reference_yaw));
+          	}
+
+          	//create a spline
+          	tk::spline s;
+
+          	//init spline with anchor points we've derived
+          	s.set_points(anchor_points_x, anchor_points_y);
+
+
+
+          	/*
           	//go forward and stay in current lane
           	double dist_inc = 0.5;
           	for (int i = 0; i < 50; i++)
@@ -321,6 +369,7 @@ int main() {
           	    next_x_vals.push_back(xy[0]);
           	    next_y_vals.push_back(xy[1]);
           	}
+          	*/
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
           	msgJson["next_x"] = next_x_vals;
