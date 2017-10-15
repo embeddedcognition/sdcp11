@@ -293,7 +293,7 @@ int main() {
           	    double previous_reference_x = previous_path_x[previous_path_size - 2];
           	    double previous_reference_y = previous_path_y[previous_path_size - 2];
           	    //compute reference yaw
-          	    reference_yaw = atan2((reference_y - previous_reference_y), (reference_x - previous_reference_x));
+          	    //reference_yaw = atan2((reference_y - previous_reference_y), (reference_x - previous_reference_x));
           	    //use the two points that make the path tangent to the previous path's end point
           	    //add x values (spline requires that points are sorted)
           	    anchor_points_x.push_back(previous_reference_x);
@@ -376,9 +376,8 @@ int main() {
           	//the origin given our previous coordinate transformation, so no need to subtract the vehicle's position in the distance equation (since it's at zero anyway), we just square the position
           	//of the horizon point at x and y
           	double distance_to_horizon_point = distance(0, 0, horizon_x, horizon_y);
-          	        //sqrt((horizon_x * horizon_x) + (horizon_y * horizon_y));
           	//now that we have the the distance, we can compute N (the number of pieces, spaced far enough apart to maintain our target velocity)
-          	double N = distance_to_horizon_point / ((0.02 * reference_velocity) / 2.24); //reference velocity is in mph and we need that to be in meters per second so we divide by 2.24
+          	double N = distance_to_horizon_point / (0.02 * (reference_velocity / 2.24)); //reference velocity is in mph and we need that to be in meters per second so we divide by 2.24
           	//increments x by a value that ensures appropriate spacing to maintain velocity
           	double x_increment = horizon_x / N;
 
@@ -396,8 +395,8 @@ int main() {
 
           	    //now we need to transform (translate & rotate) back to global coordinates (as we're still in local coordinates - in the vehicle's perspective)
           	    //rotate (in positive direction)
-          	    x = (x * cos(reference_yaw)) - (y * sin(reference_yaw));
-          	    y = (x * sin(reference_yaw)) + (y * cos(reference_yaw));
+          	    x = (x * cos(-reference_yaw)) + (y * sin(-reference_yaw));
+          	    y = (x * -sin(-reference_yaw)) + (y * cos(-reference_yaw));
 
           	    //translate
           	    x += reference_x;
