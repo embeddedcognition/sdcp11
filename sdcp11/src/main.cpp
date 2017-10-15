@@ -395,16 +395,13 @@ int main() {
 
           	    //now we need to transform (translate & rotate) back to global coordinates (as we're still in local coordinates - in the vehicle's perspective)
           	    //rotate (in positive direction)
-          	    x = (x * cos(-reference_yaw)) + (y * sin(-reference_yaw));
-          	    y = (x * -sin(-reference_yaw)) + (y * cos(-reference_yaw));
+          	    double rotated_x = (x * cos(reference_yaw)) - (y * sin(reference_yaw));
+          	    double rotated_y = (x * sin(reference_yaw)) + (y * cos(reference_yaw));
 
-          	    //translate
-          	    x += reference_x;
-          	    y += reference_y;
-
+          	    //translate (adding reference x and y to rotated counterparts) to complete transformation back to global coordinates
           	    //push the new x/y point onto the vectors that go back to the simulator
-          	    next_x_vals.push_back(x);
-          	    next_y_vals.push_back(y);
+          	    next_x_vals.push_back(rotated_x + reference_x);
+          	    next_y_vals.push_back(rotated_y + reference_y);
           	}
 
           	/*
