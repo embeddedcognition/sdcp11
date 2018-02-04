@@ -35,13 +35,13 @@ int main(const int argc, const char** argv)
 {
     //local vars
     uWS::Hub h;
-    Utility util;
+    Utility utility;
     vector<Waypoint> map_waypoints;
     const int tcp_listen_port = 4567; //port the server will listen on
     const string file_location = "../data/highway_map.csv";
 
     //load map waypoints for the simulator highway
-    util.load_map_waypoints(map_waypoints, file_location);
+    utility.load_map_waypoints(map_waypoints, file_location);
 
     // lambda functions //
     //when a new message is received (capture reference to map_waypoints vector for use in the function)
@@ -51,7 +51,7 @@ int main(const int argc, const char** argv)
         //"42" at the start of the message means there's a websocket message event.
         //the 4 signifies a websocket message
         //the 2 signifies a websocket event
-        if ((length != 0) && (length > 2) && (data[0] == '4') && (data[1] == '2'))
+        if ((length != 0) && (length > 2) && (message[0] == '4') && (message[1] == '2'))
         {
             //check if the message has data
             auto s = get_data(message);
