@@ -9,7 +9,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-using namespace std;
+using std::vector;
+using std::string;
 
 //class declaration
 class Waypoint
