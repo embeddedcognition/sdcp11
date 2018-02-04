@@ -6,9 +6,7 @@
 #######################################################
 */
 
-#include "trajectory.h"
-
-using namespace std;
+#include "utility.h"
 
 //class definition
 //constructor
@@ -18,8 +16,8 @@ Utility::Utility() {}
 Utility::~Utility() {}
 
 //function definition
-//load the map data for the highway
-vector Utility::load_highway_map_data(string filename)
+//load the map waypoint data for the highway
+vector<Waypoint> Utility::load_map_waypoints(string filename)
 {
     //local vars
     // Waypoint map to read from

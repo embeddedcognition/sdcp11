@@ -9,6 +9,19 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+using namespace std;
+
+//class declaration
+class Waypoint
+{
+    public:
+        double x;       //cartesian x coord of waypoint
+        double y;       //cartesian y coord of waypoint
+        double s;       //frenet s coord of waypoint
+        double dx;      //x component to the vector normal/perpendicular to the waypoint
+        double dy;      //y component to the vector normal/perpendicular to the waypoint
+};
+
 //class declaration
 class Utility
 {
@@ -19,8 +32,8 @@ class Utility
         virtual ~Utility();
 
         //function declaration
-        //get the next best state to be in
-        void get_next_state(const int);
+        //load the map waypoint data for the highway
+        vector<Waypoint> load_map_waypoints(string filename);
 
     private:
         //the current NIS for radar
