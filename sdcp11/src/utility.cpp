@@ -17,8 +17,9 @@ Utility::~Utility() {}
 
 //function definition
 //load the map waypoint data for the highway
-vector<Waypoint> Utility::load_map_waypoints(string filename)
+void Utility::load_map_waypoints(vector<Waypoint>& map_waypoints, const string& filename)
 {
+    /*
     //local vars
     // Waypoint map to read from
       string map_file_ = "../data/highway_map.csv";
@@ -62,4 +63,5 @@ vector<Waypoint> Utility::load_map_waypoints(string filename)
           std::cout << "Error: Map file not read in correctly...exiting." << std::endl;
           exit(1);
       }
+      */
 }

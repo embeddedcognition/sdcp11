@@ -33,7 +33,7 @@ class Utility
 
         //function declaration
         //load the map waypoint data for the highway
-        vector<Waypoint> load_map_waypoints(string filename);
+        void load_map_waypoints(vector<Waypoint>& map_waypoints, const string& filename);
 
     private:
         //the current NIS for radar

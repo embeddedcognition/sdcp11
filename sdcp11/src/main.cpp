@@ -35,12 +35,13 @@ int main(const int argc, const char** argv)
 {
     //local vars
     uWS::Hub h;
-    int tcp_listen_port = 4567; //port the server will listen on
     Utility util;
     vector<Waypoint> map_waypoints;
+    const int tcp_listen_port = 4567; //port the server will listen on
+    const string file_location = "../data/highway_map.csv";
 
     //load map waypoints for the simulator highway
-    map_waypoints = util.load_map_waypoints("../data/highway_map.csv");
+    util.load_map_waypoints(map_waypoints, file_location);
 
     // lambda functions //
     //when a new message is received (capture reference to map_waypoints vector for use in the function)
