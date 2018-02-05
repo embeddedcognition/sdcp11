@@ -34,19 +34,22 @@ string get_data(string s);
 int main(const int argc, const char** argv)
 {
     //local vars
-    uWS::Hub h;
-    Utility utility;
-    vector<Waypoint> map_waypoints;
-    const int tcp_listen_port = 4567; //port the server will listen on
-    const string file_location = "../data/highway_map.csv";
+    uWS::Hub hub;                                                                                           //micro websocket hub class
+    function<void (uWS::WebSocket<uWS::SERVER>, char*, size_t, uWS::OpCode)> onMessage_lamda_func;          //lambda function for new message event
+    function<void (uWS::WebSocket<uWS::SERVER>, uWS::HttpRequest)> onConnection_lamda_func;                 //lambda function for new connection event
+    function<void (uWS::WebSocket<uWS::SERVER>, int, char*, size_t)> onDisconnection_lamda_func;            //lambda function for disconnect event
+    function<void (uWS::HttpResponse*, uWS::HttpRequest, char*, size_t, size_t)> onHttpRequest_lamda_func;  //lambda function for http request event
+    Utility utility;                                                                                        //utility class with helper functions
+    vector<Waypoint> map_waypoints;                                                                         //map waypoints associated with highway in the simulator
+    const int tcp_listen_port = 4567;                                                                       //port the micro websocket server will listen on
+    const string file_location = "../data/highway_map.csv";                                                 //path to map waypoint data
 
-    //load map waypoints for the simulator highway
+    //load map waypoints for the simulator highway we're driving on
     utility.load_map_waypoints(map_waypoints, file_location);
 
-    // lambda functions //
+    /// define lambda functions ///
     //when a new message is received (capture reference to map_waypoints vector for use in the function)
-    function<void (uWS::WebSocket<uWS::SERVER>, char*, size_t, uWS::OpCode)> onMessage_lamda_func =
-    [&map_waypoints] (uWS::WebSocket<uWS::SERVER> ws, char* message, size_t length, uWS::OpCode opCode)
+    onMessage_lamda_func = [&map_waypoints] (uWS::WebSocket<uWS::SERVER> ws, char* message, size_t length, uWS::OpCode opCode)
     {
         //"42" at the start of the message means there's a websocket message event.
         //the 4 signifies a websocket message
@@ -107,75 +110,48 @@ int main(const int argc, const char** argv)
         }
     };
 
-    //when a new connection is received (capture no variables use in the function)
-    function<void (uWS::WebSocket<uWS::SERVER>, uWS::HttpRequest)> onConnection_lamda_func =
-    [] (uWS::WebSocket<uWS::SERVER> ws, uWS::HttpRequest req)
+    //when a new connection is received (capture no variables for use in the function)
+    onConnection_lamda_func = [] (uWS::WebSocket<uWS::SERVER> ws, uWS::HttpRequest req)
     {
         cout << "Udacity simulator connected!!!" << endl;
     };
 
-    //when a new connection is received (capture no variables use in the function)
-    function<void (uWS::WebSocket<uWS::SERVER>, int, char*, size_t)> onDisconnection_lamda_func =
-    [] (uWS::WebSocket<uWS::SERVER> ws, int code, char* message, size_t length)
+    //when a new connection is received (capture no variables for use in the function)
+    onDisconnection_lamda_func = [] (uWS::WebSocket<uWS::SERVER> ws, int code, char* message, size_t length)
     {
         cout << "Udacity simulator disconnected!!!" << endl;
         ws.close();
     };
 
+    //when a new http request is received (capture no variables for use in the function)
+    onHttpRequest_lamda_func = [] (uWS::HttpResponse* res, uWS::HttpRequest req, char* data, size_t length, size_t remainingBytes)
+    {
+        cout << "New HTTP request received!!!" << endl;
+        const string return_message = "<h1>Hello World!</h1>";
+        res->end(return_message.data(), return_message.length());
+    };
+    /// end define lambda functions ///
+
     //register lambda functions for particular events
-    h.onConnection(onConnection_lamda_func);        //when a new connection occurs, call this lambda function
-    h.onDisconnection(onDisconnection_lamda_func);  //when a disconnect occurs, call this lambda function
-    h.onMessage(onMessage_lamda_func);              //when a new message is received, call this lambda function
+    hub.onConnection(onConnection_lamda_func);        //when a new connection occurs, call this lambda function
+    hub.onDisconnection(onDisconnection_lamda_func);  //when a disconnect occurs, call this lambda function
+    hub.onMessage(onMessage_lamda_func);              //when a new message is received, call this lambda function
+    hub.onHttpRequest(onHttpRequest_lamda_func);      //when a new http request is received, call this lambda function
 
     //attempt to listen on the tcp port (the Udacity simulator will connect to this port)
-    if (h.listen(tcp_listen_port))
+    if (hub.listen(tcp_listen_port))
     {
         cout << "Listening to port: " << tcp_listen_port << endl;
-        //start thread to watch for and process registered events (connect, message, disconnect, etc.)
-        h.run();
+        //start thread to watch for and process registered events (connect, message, disconnect, etc.) that come over the channel
+        hub.run();
+    }
+    else
+    {
+        cerr << "Failed to listen to port: " << tcp_listen_port << endl;
+        return -1;
     }
 
-    /*
-       h.onHttpRequest([](uWS::HttpResponse *res, uWS::HttpRequest req, char *data, size_t length, size_t remainingBytes)
-       {
-           res->end(const char *, size_t);
-       });
-       */
-
-  // We don't need this since we're not using HTTP but if it's removed the
-  // program
-  // doesn't compile :-(
-  /*
-  h.onHttpRequest([](uWS::HttpResponse *res, uWS::HttpRequest req, char *data,
-                     size_t, size_t) {
-    const std::string s = "<h1>Hello world!</h1>";
-    if (req.getUrl().valueLength == 1) {
-      res->end(s.data(), s.length());
-    } else {
-      // i guess this should be done more gracefully?
-      res->end(nullptr, 0);
-    }
-  });
-
-  h.onConnection([&h](uWS::WebSocket<uWS::SERVER> ws, uWS::HttpRequest req) {
-    std::cout << "Connected!!!" << std::endl;
-  });
-
-  h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code,
-                         char *message, size_t length) {
-    ws.close();
-    std::cout << "Disconnected" << std::endl;
-  });
-
-  int port = 4567;
-  if (h.listen(port)) {
-    std::cout << "Listening to port " << port << std::endl;
-  } else {
-    std::cerr << "Failed to listen to port" << std::endl;
-    return -1;
-  }
-  h.run();
-  */
+    return 0;
 }
 
 //function definition

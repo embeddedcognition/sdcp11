@@ -9,19 +9,10 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include "waypoint.h"
+
 using std::vector;
 using std::string;
-
-//class declaration
-class Waypoint
-{
-    public:
-        double x;       //cartesian x coord of waypoint
-        double y;       //cartesian y coord of waypoint
-        double s;       //frenet s coord of waypoint
-        double dx;      //x component to the vector normal/perpendicular to the waypoint
-        double dy;      //y component to the vector normal/perpendicular to the waypoint
-};
 
 //class declaration
 class Utility
@@ -34,7 +25,7 @@ class Utility
 
         //function declaration
         //load the map waypoint data for the highway
-        void load_map_waypoints(vector<Waypoint>& map_waypoints, const string& filename);
+        void load_map_waypoints(vector<Waypoint> map_waypoints, string filename);
 };
 
 #endif /* UTILITY_H */
