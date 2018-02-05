@@ -12,7 +12,7 @@
 //#include <chrono>
 //#include <iostream>
 //#include <thread>
-#include <vector>
+//#include <vector>
 //#include "Eigen-3.3/Eigen/Core"
 //#include "Eigen-3.3/Eigen/QR"
 #include "json.hpp"
@@ -39,13 +39,13 @@ int main(const int argc, const char** argv)
     function<void (uWS::WebSocket<uWS::SERVER>, uWS::HttpRequest)> onConnection_lamda_func;                 //lambda function for new connection event
     function<void (uWS::WebSocket<uWS::SERVER>, int, char*, size_t)> onDisconnection_lamda_func;            //lambda function for disconnect event
     function<void (uWS::HttpResponse*, uWS::HttpRequest, char*, size_t, size_t)> onHttpRequest_lamda_func;  //lambda function for http request event
-    Utility utility;                                                                                        //utility class with helper functions
+    //Utility utility;                                                                                        //utility class with helper functions
     vector<Waypoint> map_waypoints;                                                                         //map waypoints associated with highway in the simulator
     const int tcp_listen_port = 4567;                                                                       //port the micro websocket server will listen on
     const string file_location = "../data/highway_map.csv";                                                 //path to map waypoint data
 
     //load map waypoints for the simulator highway we're driving on
-    utility.load_map_waypoints(map_waypoints, file_location);
+    //utility.load_map_waypoints(map_waypoints, file_location);
 
     /// define lambda functions ///
     //when a new message is received (capture reference to map_waypoints vector for use in the function)
@@ -77,7 +77,9 @@ int main(const int argc, const char** argv)
                     double car_yaw = j[1]["yaw"];
                     double car_speed = j[1]["speed"];
 
-                    std::cout << "car_d: " << car_d << std::endl;
+                    cout << "car_d: " << car_d << endl;
+
+                    cout << "map_waypoints length: " << map_waypoints.size() << endl;
 
                     // Previous path data given to the Planner
                     auto previous_path_x = j[1]["previous_path_x"];
@@ -91,10 +93,12 @@ int main(const int argc, const char** argv)
 
                     json msgJson;
 
+                    vector<double> next_x_vals;
+                    vector<double> next_y_vals;
 
                     // TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-                    //msgJson["next_x"] = next_x_vals;
-                    //msgJson["next_y"] = next_y_vals;
+                    msgJson["next_x"] = next_x_vals;
+                    msgJson["next_y"] = next_y_vals;
 
                     auto msg = "42[\"control\","+ msgJson.dump()+"]";
 
@@ -116,11 +120,13 @@ int main(const int argc, const char** argv)
         cout << "Udacity simulator connected!!!" << endl;
     };
 
-    //when a new connection is received (capture no variables for use in the function)
-    onDisconnection_lamda_func = [] (uWS::WebSocket<uWS::SERVER> ws, int code, char* message, size_t length)
+    //when a disconnect occurs (capture reference to hub for use in the function)
+    onDisconnection_lamda_func = [&hub] (uWS::WebSocket<uWS::SERVER> ws, int code, char* message, size_t length)
     {
         cout << "Udacity simulator disconnected!!!" << endl;
-        ws.close();
+        cout << "Shutting down..." << endl;
+        //gracefully shutdown the server
+        hub.getDefaultGroup<uWS::SERVER>().close();
     };
 
     //when a new http request is received (capture no variables for use in the function)
@@ -136,7 +142,7 @@ int main(const int argc, const char** argv)
     hub.onConnection(onConnection_lamda_func);        //when a new connection occurs, call this lambda function
     hub.onDisconnection(onDisconnection_lamda_func);  //when a disconnect occurs, call this lambda function
     hub.onMessage(onMessage_lamda_func);              //when a new message is received, call this lambda function
-    hub.onHttpRequest(onHttpRequest_lamda_func);      //when a new http request is received, call this lambda function
+    //hub.onHttpRequest(onHttpRequest_lamda_func);      //when a new http request is received, call this lambda function
 
     //attempt to listen on the tcp port (the Udacity simulator will connect to this port)
     if (hub.listen(tcp_listen_port))
