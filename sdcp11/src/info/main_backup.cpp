@@ -38,6 +38,7 @@ int main(const int argc, const char** argv)
     function<void (uWS::WebSocket<uWS::SERVER>, char*, size_t, uWS::OpCode)> onMessage_lamda_func;          //lambda function for new message event
     function<void (uWS::WebSocket<uWS::SERVER>, uWS::HttpRequest)> onConnection_lamda_func;                 //lambda function for new connection event
     function<void (uWS::WebSocket<uWS::SERVER>, int, char*, size_t)> onDisconnection_lamda_func;            //lambda function for disconnect event
+    function<void (uWS::HttpResponse*, uWS::HttpRequest, char*, size_t, size_t)> onHttpRequest_lamda_func;  //lambda function for http request event
     Utility utility;                                                                                        //utility class with helper functions
     vector<Waypoint> map_waypoints;                                                                         //map waypoints associated with highway in the simulator
     const int tcp_listen_port = 4567;                                                                       //port the micro websocket server will listen on
@@ -127,12 +128,23 @@ int main(const int argc, const char** argv)
         //gracefully shutdown the server
         hub.getDefaultGroup<uWS::SERVER>().close();
     };
+
+    /*
+    //when a new http request is received (capture no variables for use in the function)
+    onHttpRequest_lamda_func = [] (uWS::HttpResponse* res, uWS::HttpRequest req, char* data, size_t length, size_t remainingBytes)
+    {
+        cout << "New HTTP request received!!!" << endl;
+        const string return_message = "<h1>Hello World!</h1>";
+        res->end(return_message.data(), return_message.length());
+    };
+    */
     /// end define lambda functions ///
 
     //register lambda functions for particular events
     hub.onConnection(onConnection_lamda_func);        //when a new connection occurs, call this lambda function
     hub.onDisconnection(onDisconnection_lamda_func);  //when a disconnect occurs, call this lambda function
     hub.onMessage(onMessage_lamda_func);              //when a new message is received, call this lambda function
+    //hub.onHttpRequest(onHttpRequest_lamda_func);      //when a new http request is received, call this lambda function
 
     //attempt to listen on the tcp port (the Udacity simulator will connect to this port)
     if (hub.listen(tcp_listen_port))
