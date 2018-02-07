@@ -17,7 +17,7 @@ Utility::~Utility() {}
 
 //function definition
 //load the map waypoint data for the highway
-void Utility::load_map_waypoints(vector<Waypoint> map_waypoints, string filename)
+void Utility::load_map_waypoints(vector<Waypoint>& map_waypoints, const string& filename)
 {
     return;
 

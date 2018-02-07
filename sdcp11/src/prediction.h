@@ -9,6 +9,7 @@
 #ifndef PREDICTION_H
 #define PREDICTION_H
 
+//class declaration
 class Prediction
 {
     public:

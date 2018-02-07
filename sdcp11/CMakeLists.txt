@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 set(sources
 	src/main.cpp
 	src/behavior.cpp
+	src/prediction.cpp
 	src/trajectory.cpp
 	src/utility.cpp)
 
