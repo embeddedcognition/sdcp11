@@ -124,8 +124,9 @@ int main(const int argc, const char** argv)
     {
         cout << "Udacity simulator disconnected!!!" << endl;
         cout << "Shutting down..." << endl;
-        //gracefully shutdown the server
+        //gracefully shutdown
         hub.getDefaultGroup<uWS::SERVER>().close();
+        exit(0);
     };
     /// end define lambda functions ///
 
@@ -138,7 +139,7 @@ int main(const int argc, const char** argv)
     if (hub.listen(tcp_listen_port))
     {
         cout << "Listening to port: " << tcp_listen_port << endl;
-        //start thread to watch for and process registered events (connect, message, disconnect, etc.) that come over the channel
+        //start watching for and processing registered events (connect, message, disconnect, etc.) that come over the channel
         hub.run();
     }
     else
