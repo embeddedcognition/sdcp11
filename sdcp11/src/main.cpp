@@ -39,13 +39,13 @@ int main(const int argc, const char** argv)
     function<void (uWS::WebSocket<uWS::SERVER>, uWS::HttpRequest)> onConnection_lamda_func;                 //lambda function for new connection event
     function<void (uWS::WebSocket<uWS::SERVER>, int, char*, size_t)> onDisconnection_lamda_func;            //lambda function for disconnect event
     function<void (uWS::HttpResponse*, uWS::HttpRequest, char*, size_t, size_t)> onHttpRequest_lamda_func;  //lambda function for http request event
-    //Utility utility;                                                                                        //utility class with helper functions
+    Utility utility;                                                                                        //utility class with helper functions
     vector<Waypoint> map_waypoints;                                                                         //map waypoints associated with highway in the simulator
     const int tcp_listen_port = 4567;                                                                       //port the micro websocket server will listen on
     const string file_location = "../data/highway_map.csv";                                                 //path to map waypoint data
 
     //load map waypoints for the simulator highway we're driving on
-    //utility.load_map_waypoints(map_waypoints, file_location);
+    utility.load_map_waypoints(map_waypoints, file_location);
 
     /// define lambda functions ///
     //when a new message is received (capture reference to map_waypoints vector for use in the function)
@@ -129,6 +129,7 @@ int main(const int argc, const char** argv)
         hub.getDefaultGroup<uWS::SERVER>().close();
     };
 
+    /*
     //when a new http request is received (capture no variables for use in the function)
     onHttpRequest_lamda_func = [] (uWS::HttpResponse* res, uWS::HttpRequest req, char* data, size_t length, size_t remainingBytes)
     {
@@ -136,6 +137,7 @@ int main(const int argc, const char** argv)
         const string return_message = "<h1>Hello World!</h1>";
         res->end(return_message.data(), return_message.length());
     };
+    */
     /// end define lambda functions ///
 
     //register lambda functions for particular events
