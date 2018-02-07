@@ -9,7 +9,6 @@
 #include "trajectory.h"
 
 using namespace std;
-using std::vector;
 
 //class definition
 //constructor
@@ -20,7 +19,7 @@ Trajectory::~Trajectory() {}
 
 //function definition
 //get the next best state to be in
-vector Trajectory::get_next_state()
+void Trajectory::get_next_state()
 {
     //local vars
 }

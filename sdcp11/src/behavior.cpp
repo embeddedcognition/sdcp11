@@ -9,7 +9,6 @@
 #include "behavior.h"
 
 using namespace std;
-using std::vector;
 
 //class definition
 //constructor
@@ -20,7 +19,7 @@ Behavior::~Behavior() {}
 
 //function definition
 //get the next best state to be in
-vector Behavior::get_next_state()
+void Behavior::get_next_state()
 {
     //local vars
 }

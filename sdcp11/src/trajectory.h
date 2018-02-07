@@ -9,8 +9,6 @@
 #ifndef TRAJECTORY_H
 #define TRAJECTORY_H
 
-#include <vector>
-
 //class declaration
 class Trajectory
 {
@@ -22,11 +20,7 @@ class Trajectory
 
         //function declaration
         //get the next best state to be in
-        void get_next_state(const int);
-
-    private:
-        //the current NIS for radar
-        double NIS_radar_;
+        void get_next_state();
 };
 
 #endif /* TRAJECTORY_H */

@@ -9,8 +9,6 @@
 #ifndef BEHAVIOR_H
 #define BEHAVIOR_H
 
-#include <vector>
-
 //class declaration
 class Behavior
 {
@@ -22,11 +20,7 @@ class Behavior
 
         //function declaration
         //get the next best state to be in
-        void get_next_state(const int);
-
-    private:
-        //the current NIS for radar
-        double NIS_radar_;
+        void get_next_state();
 };
 
 #endif /* BEHAVIOR_H */
