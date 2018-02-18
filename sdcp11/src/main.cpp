@@ -108,7 +108,7 @@ int main(const int argc, const char** argv)
             else
             {
                 // Manual driving
-                std::string msg = "42[\"manual\",{}]";
+                string msg = "42[\"manual\",{}]";
                 ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
             }
         }
