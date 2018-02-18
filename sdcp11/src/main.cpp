@@ -7,25 +7,27 @@
 */
 
 //#include <math.h>
-#include <uWS/uWS.h>
+//#include <uWS/uWS.h>
 //#include <chrono>
 //#include <thread>
 //#include <vector>
 //#include "Eigen-3.3/Eigen/Core"
 //#include "Eigen-3.3/Eigen/QR"
-#include "json.hpp"
+//#include "json.hpp"
 //#include "spline.h"
 
 //includes
+#include "websocketserver.h"
 #include "utility.h"
 
 //namespaces
 using std::function;
+using std::size_t;
 using json = nlohmann::json; //shortened for convenience
 
 //function declarations
 int main(const int, const char**);
-string get_data(string s);
+bool valid_json_payload_extracted(const string& message, string& json_payload);
 
 //function definition
 //main thread of execution
@@ -51,17 +53,23 @@ int main(const int argc, const char** argv)
     //when a new message is received (capture reference to map_waypoints vector for use in the function)
     onMessage_lamda_func = [&map_waypoints] (uWS::WebSocket<uWS::SERVER> ws, char* message, size_t length, uWS::OpCode opCode)
     {
-        //"42" at the start of the message means there's a websocket message event.
-        //the 4 signifies a websocket message
-        //the 2 signifies a websocket event
+        //local vars
+        string json_payload;    //stores the json payload from the received message
+
+        //the simulator and our server leverage a custom identifier ("42") at the beginning of messages to quickly identify them a websocket message events
+        //the "4" signifies a websocket message, and the "2" signifies a websocket event
+        //not sure why this is necessary (maybe to ensure other potential websocket client traffic is not confused as simulator events, regardless, the simulator requires it
+        //the 42 is stripped off of the message and the remaining json is parsed for further usage
+
+        //ensure the message contains data and that it has a 42 at the start, the remaining data after the first 2 bytes should be json (but we validate that)
         if ((length != 0) && (length > 2) && (message[0] == '4') && (message[1] == '2'))
         {
-            //check if the message has data
-            auto s = get_data(message);
-
-            if (s != "")
+            //if a valid json structure was found
+            if (valid_json_payload_extracted(message, json_payload))
             {
-                auto j = json::parse(s);
+                cout << "JSON: " << json_payload << endl;
+
+                auto j = json::parse(json_payload);
 
                 string event = j[0].get<string>();
 
@@ -77,9 +85,9 @@ int main(const int argc, const char** argv)
                     double car_yaw = j[1]["yaw"];
                     double car_speed = j[1]["speed"];
 
-                    cout << "car_d: " << car_d << endl;
+                    //cout << "car_d: " << car_d << endl;
 
-                    cout << "map_waypoints length: " << map_waypoints.size() << endl;
+                    //cout << "map_waypoints length: " << map_waypoints.size() << endl;
 
                     // Previous path data given to the Planner
                     auto previous_path_x = j[1]["previous_path_x"];
@@ -153,19 +161,44 @@ int main(const int argc, const char** argv)
 }
 
 //function definition
-//checks if the socketio event has json data, if so the json object in string format will be returned, else the empty string "" will be returned
-string get_data(string s)
+//if a valid json structure is found in the message, it is returned
+bool valid_json_payload_extracted(const string& message, string& json_payload)
 {
-    auto found_null = s.find("null");
-    auto b1 = s.find_first_of("[");
-    auto b2 = s.find_first_of("}");
-    if (found_null != string::npos)
+    //local vars
+    size_t left_bracket_position;           //index position of "[", if found
+    size_t right_curly_brace_postition;     //index position of "}", if found
+
+    //locate any nulls in the message (if present, we ignore this message completely)
+    //if we found a "null", clear json_payload (to ensure state) and return false
+    if (message.find("null") != string::npos)
     {
-        return "";
+        json_payload = "";
+        return false;
     }
-    else if (b1 != string::npos && b2 != string::npos)
+
+    //message example:
+    //42["telemetry",{"x":909.48,"y":1128.67,"yaw":0,"speed":0,"s":124.8336,"d":6.164833,"previous_path_x":[],"previous_path_y":[],"end_path_s":0,"end_path_d":0,
+    //"sensor_fusion":[[0,1029.313,1148.76,19.30196,7.989753,244.4689,9.997465],[1,775.8,1425.2,0,0,6719.219,-280.1494],[2,775.8,1429,0,0,6716.599,-282.9019],
+    //[3,775.8,1432.9,0,0,6713.911,-285.7268],[4,775.8,1436.3,0,0,6711.566,-288.1896],[5,775.8,1441.7,0,0,6661.772,-291.7797],[6,762.1,1421.6,0,0,6711.778,-268.0964],
+    //[7,762.1,1425.2,0,0,6709.296,-270.7039],[8,762.1,1429,0,0,6663.543,-273.1828],[9,762.1,1432.9,0,0,6660.444,-275.5511],[10,762.1,1436.3,0,0,6657.743,-277.6157],
+    //[11,762.1,1441.7,0,0,6653.453,-280.8947]]}]
+
+    //validate json structure
+    left_bracket_position = message.find_first_of("[");         //this should be the start of the structure (this also allows us to skip the 42 at the beginning)
+    right_curly_brace_postition = message.find_first_of("}");   //since other right brackets could exist in the message, use the right curly brace to find the end
+
+    //if we found signs of a json structure, return it
+    if ((left_bracket_position != string::npos) && (right_curly_brace_postition != string::npos))
     {
-        return s.substr(b1, b2 - b1 + 2);
+        //capture the json payload
+        //"right_curly_brace_postition - left_bracket_position + 2" will ensure the last right bracket (after the ending curly brace) is captured
+        json_payload = message.substr(left_bracket_position, right_curly_brace_postition - left_bracket_position + 2);
+        //return success
+        return true;
     }
-    return "";
+    else //no json structure is present, so return false
+    {
+        json_payload = "";
+        return false;
+    }
 }
