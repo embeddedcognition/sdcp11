@@ -9,10 +9,16 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+//includes
+#include <iostream>
 #include <string>
 #include <vector>
 #include "waypoint.h"
 
+//namespaces
+using std::cout;
+using std::cerr;
+using std::endl;
 using std::vector;
 using std::string;
 
@@ -27,7 +33,7 @@ class Utility
 
         //function declaration
         //load the map waypoint data for the highway
-        void load_map_waypoints(vector<Waypoint>& map_waypoints, const string& filename);
+        void load_map_waypoints(vector<Waypoint>& map_waypoints, const string& file_location);
 };
 
 #endif /* UTILITY_H */
