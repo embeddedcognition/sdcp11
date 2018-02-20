@@ -45,7 +45,7 @@ void WebSocketServer::start(GuidanceController& guidance_controller)
     function<void (WebSocket<SERVER>, int, char*, size_t)> onDisconnection_lamda_func;       //lambda function for disconnect event
 
     /// define lambda functions ///
-    //when a new message is received (capture reference to guidance_controller and current object for use in the function)
+    //when a new message is received (capture reference to guidance_controller and current object (to allow calling of valid_json_payload_extracted()) for use in the function)
     onMessage_lamda_func = [&guidance_controller, this] (WebSocket<SERVER> ws, char* message, size_t length, OpCode opCode)
     {
         //local vars
