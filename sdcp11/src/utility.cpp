@@ -11,7 +11,7 @@
 #include <sstream>
 #include "utility.h"
 
-//namespaces
+//scoping
 using std::ifstream;
 using std::istringstream;
 
