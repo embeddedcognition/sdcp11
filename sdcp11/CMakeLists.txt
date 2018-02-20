@@ -14,6 +14,8 @@ set(sources
 	src/trajectory.cpp
 	src/utility.cpp)
 
+include_directories(inc)
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
 
 include_directories(/usr/local/include)
