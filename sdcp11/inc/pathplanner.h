@@ -10,11 +10,13 @@
 #define PATHPLANNER_H
 
 //includes
+#include <vector>
 #include <string>
 #include "json.hpp"
 #include "requestprocessor.h"
 
 //scoping
+using std::vector;
 using std::string;
 using json = nlohmann::json; //using type alias for convenience
 

@@ -20,10 +20,10 @@ PathPlanner::~PathPlanner() {}
 json PathPlanner::compute_response_message_payload(const json& request_message_payload)
 {
     //local vars
-    json return_val;
+    json responset_message_payload;
 
 
-    // telemetry[1] is the data JSON object
+    //request_message_payload[1] is the data JSON object
 
                         // Main car's localization Data
                         double car_x = request_message_payload[1]["x"];
@@ -48,23 +48,16 @@ json PathPlanner::compute_response_message_payload(const json& request_message_p
                         auto sensor_fusion = request_message_payload[1]["sensor_fusion"];
 
 
+                        //package and send back json
 
-
-
-
-
-
-
-    //package and send back json
-
-    //vector<double> next_x_vals;
-                        //vector<double> next_y_vals;
+                        vector<double> next_x_vals;
+                        vector<double> next_y_vals;
 
                         // TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-                        //msgJson["next_x"] = next_x_vals;
-                        //msgJson["next_y"] = next_y_vals;
+                        responset_message_payload["next_x"] = next_x_vals;
+                        responset_message_payload["next_y"] = next_y_vals;
 
 
 
-    return return_val;
+    return responset_message_payload;
 }

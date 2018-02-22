@@ -15,7 +15,7 @@
 #include <vector>
 #include "waypoint.h"
 
-//namespaces
+//scoping
 using std::cout;
 using std::cerr;
 using std::endl;
