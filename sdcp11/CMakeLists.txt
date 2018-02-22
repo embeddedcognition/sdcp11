@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 set(sources
 	src/main.cpp
 	src/websocketserver.cpp
-	src/guidancecontroller.cpp
+	src/requestprocessor.cpp
 	src/pathplanner.cpp
 	src/behavior.cpp
 	src/prediction.cpp

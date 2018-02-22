@@ -7,11 +7,11 @@
 */
 
 //includes
-#include "guidancecontroller.h"
+#include "requestprocessor.h"
 
 //class definition
 //constructor
-GuidanceController::GuidanceController() {}
+RequestProcessor::RequestProcessor() {}
 
 //destructor
-GuidanceController::~GuidanceController() {}
+RequestProcessor::~RequestProcessor() {}

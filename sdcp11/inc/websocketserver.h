@@ -12,8 +12,8 @@
 //includes
 #include <string>
 #include <uWS/uWS.h>
-#include "guidancecontroller.h"
 #include "json.hpp"
+#include "requestprocessor.h"
 
 //class declaration
 class WebSocketServer
@@ -25,15 +25,15 @@ class WebSocketServer
         virtual ~WebSocketServer();
 
         //function declaration
-        //start the web socket server and inject the message processor dependency
-        //the guidance controller is who the server forwards telmetry contained in client messages to for processing
-        //and gets back control commands from it to send back to the client in response
-        void start(GuidanceController& guidance_controller);
+        //start the web socket server and inject the telemetry processor dependency
+        //the request processor is who the server forwards payloads contained in client messages to for processing
+        //and gets back information from it to send back to the client in response
+        void start(RequestProcessor& request_processor);
 
     private:
         //function declaration
-        //if a valid json structure is found in the message, it is returned
-        bool valid_json_payload_extracted(const string& message, string& json_payload);
+        //if a valid payload is found in the message, it is returned
+        bool valid_message_payload_extracted(const string& message, json& payload);
 };
 
 #endif /* WEBSOCKETSERVER_H */

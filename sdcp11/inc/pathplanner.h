@@ -12,14 +12,14 @@
 //includes
 #include <string>
 #include "json.hpp"
-#include "guidancecontroller.h"
+#include "requestprocessor.h"
 
 //scoping
 using std::string;
 using json = nlohmann::json; //using type alias for convenience
 
 //class declaration
-class PathPlanner : public GuidanceController
+class PathPlanner : public RequestProcessor
 {
     public:
         //constructor
@@ -28,8 +28,8 @@ class PathPlanner : public GuidanceController
         virtual ~PathPlanner();
 
         //function declaration
-        //process telemetry and return guidance control (this is an override of a purely virtual function defined in the superclass "GuidanceController")
-        json get_control_guidance_based_on_processed_telemetry(const json& telemetry);
+        //process vehicle telemetry and return guidance/trajectory (this is an override of a purely virtual function defined in the superclass "TelemetryProcessor")
+        json compute_response_message_payload(const json& request_message_payload);
 };
 
 #endif /* PATHPLANNER_H */

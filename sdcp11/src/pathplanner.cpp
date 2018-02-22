@@ -17,7 +17,7 @@ PathPlanner::~PathPlanner() {}
 
 //function definition
 //process telemetry and return guidance control
-json PathPlanner::get_control_guidance_based_on_processed_telemetry(const json& telemetry)
+json PathPlanner::compute_response_message_payload(const json& request_message_payload)
 {
     //local vars
     json return_val;
@@ -26,26 +26,26 @@ json PathPlanner::get_control_guidance_based_on_processed_telemetry(const json& 
     // telemetry[1] is the data JSON object
 
                         // Main car's localization Data
-                        double car_x = telemetry[1]["x"];
-                        double car_y = telemetry[1]["y"];
-                        double car_s = telemetry[1]["s"];
-                        double car_d = telemetry[1]["d"];
-                        double car_yaw = telemetry[1]["yaw"];
-                        double car_speed = telemetry[1]["speed"];
+                        double car_x = request_message_payload[1]["x"];
+                        double car_y = request_message_payload[1]["y"];
+                        double car_s = request_message_payload[1]["s"];
+                        double car_d = request_message_payload[1]["d"];
+                        double car_yaw = request_message_payload[1]["yaw"];
+                        double car_speed = request_message_payload[1]["speed"];
 
                         //cout << "car_d: " << car_d << endl;
 
                         //cout << "map_waypoints length: " << map_waypoints.size() << endl;
 
                         // Previous path data given to the Planner
-                        auto previous_path_x = telemetry[1]["previous_path_x"];
-                        auto previous_path_y = telemetry[1]["previous_path_y"];
+                        auto previous_path_x = request_message_payload[1]["previous_path_x"];
+                        auto previous_path_y = request_message_payload[1]["previous_path_y"];
                         // Previous path's end s and d values
-                        double end_path_s = telemetry[1]["end_path_s"];
-                        double end_path_d = telemetry[1]["end_path_d"];
+                        double end_path_s = request_message_payload[1]["end_path_s"];
+                        double end_path_d = request_message_payload[1]["end_path_d"];
 
                         // Sensor Fusion Data, a list of all other cars on the same side of the road.
-                        auto sensor_fusion = telemetry[1]["sensor_fusion"];
+                        auto sensor_fusion = request_message_payload[1]["sensor_fusion"];
 
 
 
