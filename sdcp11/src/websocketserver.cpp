@@ -32,7 +32,7 @@ WebSocketServer::WebSocketServer() {}
 WebSocketServer::~WebSocketServer() {}
 
 //function definition
-//start the web socket server and inject the telemetry processor dependency
+//start the web socket server and inject the request processor dependency
 //the telemetry processor is who the server forwards telmetry contained in client messages to for processing
 //and gets back information from it to send back to the client in response
 void WebSocketServer::start(RequestProcessor& request_processor)
