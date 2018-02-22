@@ -141,7 +141,7 @@ bool WebSocketServer::valid_message_payload_extracted(const string& message, jso
     }
 
     //if this is a telemetry event
-    if (message.find("telemetry") == string::npos)
+    if (message.find("telemetry") != string::npos)
     {
         //validate json structure
         left_bracket_position = message.find_first_of("[");         //this should be the start of the structure (this also allows us to skip the 42 at the beginning)
