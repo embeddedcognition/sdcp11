@@ -24,7 +24,7 @@ PathPlanner::~PathPlanner() {}
 json PathPlanner::compute_response_message_payload(const json& request_message_payload)
 {
     //local vars
-    json responset_message_payload;
+    json response_message_payload;
 
 
     //request_message_payload[1] is the data JSON object
@@ -58,10 +58,10 @@ json PathPlanner::compute_response_message_payload(const json& request_message_p
                         vector<double> next_y_vals;
 
                         // TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-                        responset_message_payload["next_x"] = next_x_vals;
-                        responset_message_payload["next_y"] = next_y_vals;
+                        response_message_payload["next_x"] = next_x_vals;
+                        response_message_payload["next_y"] = next_y_vals;
 
 
 
-    return responset_message_payload;
+    return response_message_payload;
 }

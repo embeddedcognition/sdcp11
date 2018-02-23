@@ -9,6 +9,9 @@
 #ifndef TRAJECTORY_H
 #define TRAJECTORY_H
 
+//includes
+#include "spline.h"
+
 //class declaration
 class Trajectory
 {
@@ -20,7 +23,7 @@ class Trajectory
 
         //function declaration
         //get the next best state to be in
-        void get_next_state();
+        void compute_path();
 };
 
 #endif /* TRAJECTORY_H */
