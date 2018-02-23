@@ -6,8 +6,8 @@
 #######################################################
 */
 
-#ifndef WEBSOCKETSERVER_H
-#define WEBSOCKETSERVER_H
+#ifndef SIMULATORSERVER_H
+#define SIMULATORSERVER_H
 
 //includes
 #include <string>
@@ -16,18 +16,18 @@
 #include "requestprocessor.h"
 
 //class declaration
-class WebSocketServer
+class SimulatorServer
 {
     public:
         //constructor
-        WebSocketServer();
+        SimulatorServer();
         //destructor
-        virtual ~WebSocketServer();
+        virtual ~SimulatorServer();
 
         //function declaration
-        //start the web socket server and inject the telemetry processor dependency
-        //the request processor is who the server forwards payloads contained in client messages to for processing
-        //and gets back information from it to send back to the client in response
+        //start the simulator server and inject the request processor dependency
+        //the request processor is who the server forwards payloads (contained in messages received from the Udacity simulator)
+        //to for processing and gets back information from it to send back to the Udacity simulator in response
         void start(RequestProcessor& request_processor);
 
     private:
@@ -36,4 +36,4 @@ class WebSocketServer
         bool valid_message_payload_extracted(const string& message, json& payload);
 };
 
-#endif /* WEBSOCKETSERVER_H */
+#endif /* SIMULATORSERVER_H */

@@ -7,7 +7,7 @@
 */
 
 //includes
-#include "websocketserver.h"
+#include "simulatorserver.h"
 
 //scoping
 using std::string;
@@ -26,16 +26,16 @@ using uWS::HttpRequest;
 
 //class definition
 //constructor
-WebSocketServer::WebSocketServer() {}
+SimulatorServer::SimulatorServer() {}
 
 //destructor
-WebSocketServer::~WebSocketServer() {}
+SimulatorServer::~SimulatorServer() {}
 
 //function definition
-//start the web socket server and inject the request processor dependency
-//the telemetry processor is who the server forwards telmetry contained in client messages to for processing
-//and gets back information from it to send back to the client in response
-void WebSocketServer::start(RequestProcessor& request_processor)
+//start the simulator server and inject the request processor dependency
+//the request processor is who the server forwards payloads (contained in messages received from the Udacity simulator)
+//to for processing and gets back information from it to send back to the Udacity simulator in response
+void SimulatorServer::start(RequestProcessor& request_processor)
 {
     //local vars
     const int tcp_listen_port = 4567;                                                        //port the micro websocket server will listen on
@@ -45,7 +45,7 @@ void WebSocketServer::start(RequestProcessor& request_processor)
     function<void (WebSocket<SERVER>, int, char*, size_t)> onDisconnection_lamda_func;       //lambda function for disconnect event
 
     /// define lambda functions ///
-    //when a new message is received (capture reference to telemetry_processor and current object (to allow calling of valid_json_payload_extracted()) for use in the function)
+    //when a new message is received (capture reference to request_processor and current object (to allow calling of valid_message_payload_extracted()) for use in the function)
     onMessage_lamda_func = [&request_processor, this] (WebSocket<SERVER> web_socket, char* request_message, size_t request_message_length, OpCode op_code)
     {
         //local vars
@@ -53,7 +53,7 @@ void WebSocketServer::start(RequestProcessor& request_processor)
         json response_message_payload;      //object representation of the json structure for easy element extraction
         string response_message;            //response message text string
 
-        //the simulator and our server leverage a custom identifier ("42") at the beginning of messages to quickly identify them as websocket message events
+        //the Udacity simulator and our server leverage a custom identifier ("42") at the beginning of messages to quickly identify them as websocket message events
         //the "4" signifies a websocket message, and the "2" signifies a websocket event
         //not sure why this is necessary (maybe to ensure other potential websocket client traffic is not confused as simulator events, regardless, the simulator requires it
         //the 42 is stripped off of the message and the remaining part is parsed for further usage
@@ -119,7 +119,7 @@ void WebSocketServer::start(RequestProcessor& request_processor)
 
 //function definition
 //if a valid payload is found in the message, it is returned
-bool WebSocketServer::valid_message_payload_extracted(const string& message, json& payload)
+bool SimulatorServer::valid_message_payload_extracted(const string& message, json& payload)
 {
     //local vars
     size_t left_bracket_position;           //index position of "[", if found
