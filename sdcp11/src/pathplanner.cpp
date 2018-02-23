@@ -10,7 +10,11 @@
 
 //class definition
 //constructor
-PathPlanner::PathPlanner() {}
+PathPlanner::PathPlanner()
+{
+    //load map waypoints for the simulator highway we're driving on
+    utility_.load_map_waypoints(map_waypoints_, file_location_);
+}
 
 //destructor
 PathPlanner::~PathPlanner() {}
