@@ -42,7 +42,7 @@ int main(const int argc, const char** argv)
     //load map waypoints for the simulator highway we're driving on
     //utility.load_map_waypoints(map_waypoints, file_location);
 
-    //start the simulator server, to listen for Udacity simulator connections, once connected send telemetry to the path planner and have it return back trajectories to the simulator
+    //start the simulator server, to listen for Udacity simulator connections, once connected forward telemetry to the path planner and have it return back trajectories to the simulator
     simulator_server.start(path_planner);
 
     return 0;
