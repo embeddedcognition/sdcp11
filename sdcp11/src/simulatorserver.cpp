@@ -163,4 +163,3 @@ bool SimulatorServer::valid_message_payload_extracted(const string& message, jso
     //structure is incorrect, so return false
     return false;
 }
-
