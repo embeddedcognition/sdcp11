@@ -18,8 +18,8 @@ Trajectory::Trajectory() {}
 Trajectory::~Trajectory() {}
 
 //function definition
-//get the next best state to be in
-void Trajectory::compute_path()
+//based on the behavioral guidance, compute a vehicle trajectory
+void Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry, const vector<Waypoint>& map_waypoints)
 {
     //local vars
 
@@ -28,7 +28,7 @@ void Trajectory::compute_path()
     //define a reference velocity that acts as the speed we want to hover around but not exceed
     double reference_velocity = 49.5;
     //capture the size of the previous set of path points that were not reached in the last iteration (the remaining points at the end of the previous plan)
-    int previous_path_size = previous_path_x.size();
+    int previous_path_size = vehicle_telemetry.unconsumed_previous_path_x.size();
 
     //create a list of widely spaced (x, y) anchor points, evenly spaced apart at 30 meters
     //we'll interpolate these points using the spline library to fill in the gaps at the spacing
@@ -38,9 +38,9 @@ void Trajectory::compute_path()
 
     //establish reference x, y, yaw states
     //on the first iteration we'll not have a previous set of path points to extend upon so we need to start with the vehicle's current location
-    double reference_x = car_x;
-    double reference_y = car_y;
-    double reference_yaw = deg2rad(car_yaw);
+    double reference_x = vehicle_telemetry.x;
+    double reference_y = vehicle_telemetry.y;
+    double reference_yaw = deg2rad(vehicle_telemetry.yaw);
 
     //if the previous path size contains less then 2 points, we'll need to use the vehicle's position as a starting reference
     //we'll create a second point (previous to the vehicle's current position) based on the vehicle's current yaw
@@ -48,23 +48,23 @@ void Trajectory::compute_path()
     {
         //compute two anchor points (the vehicle's current position and a point before that) to use since we don't have a previous path to look at
         //we use the vehicle's yaw angle to ensure the previous point is on the same line as the vehicle's angle
-        double previous_car_x = car_x - cos(car_yaw);
-        double previous_car_y = car_y - sin(car_yaw);
+        double previous_car_x = vehicle_telemetry.x - cos(vehicle_telemetry.yaw);
+        double previous_car_y = vehicle_telemetry.y - sin(vehicle_telemetry.yaw);
         //add x values (spline requires that points are sorted)
         anchor_points_x.push_back(previous_car_x);
-        anchor_points_x.push_back(car_x);
+        anchor_points_x.push_back(vehicle_telemetry.x);
         //add y values (spline requires that points are sorted)
         anchor_points_y.push_back(previous_car_y);
-        anchor_points_y.push_back(car_y);
+        anchor_points_y.push_back(vehicle_telemetry.y);
     }
     else //use previous path's end point as starting reference
     {
         //redefine reference state as previous path's end point (for continuity between the previous path and the future path)
-        reference_x = previous_path_x[previous_path_size - 1];
-        reference_y = previous_path_y[previous_path_size - 1];
+        reference_x = vehicle_telemetry.unconsumed_previous_path_x[previous_path_size - 1];
+        reference_y = vehicle_telemetry.unconsumed_previous_path_y[previous_path_size - 1];
         //also get second-to-last previous path point and then compute reference yaw based on them
-        double previous_reference_x = previous_path_x[previous_path_size - 2];
-        double previous_reference_y = previous_path_y[previous_path_size - 2];
+        double previous_reference_x = vehicle_telemetry.unconsumed_previous_path_x[previous_path_size - 2];
+        double previous_reference_y = vehicle_telemetry.unconsumed_previous_path_y[previous_path_size - 2];
         //compute reference yaw
         //reference_yaw = atan2((reference_y - previous_reference_y), (reference_x - previous_reference_x));
         //use the two points that make the path tangent to the previous path's end point
@@ -91,9 +91,9 @@ void Trajectory::compute_path()
 
     //for our future path, we now plot 3 points into the future and use spline to fill in the gaps
     //convert the s and d values into an x/y coordinate
-    vector<double> next_xy_30 = getXY(car_s + 30, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-    vector<double> next_xy_60 = getXY(car_s + 60, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-    vector<double> next_xy_90 = getXY(car_s + 90, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+    vector<double> next_xy_30 = getXY(vehicle_telemetry.s + 30, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+    vector<double> next_xy_60 = getXY(vehicle_telemetry.s + 60, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+    vector<double> next_xy_90 = getXY(vehicle_telemetry.s + 90, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 
     //push the spaced future points onto the vectors
     //x (spline requires that points are sorted)
@@ -132,10 +132,10 @@ void Trajectory::compute_path()
     //populate all the points left over from the last plan (for continuity between path plans)
     //this will also keep us from having to generate a whole path each time, we only generate points for amount of points
     //that were consumed during the last iteration
-    for (int i = 0; i < previous_path_x.size(); i++)
+    for (int i = 0; i < vehicle_telemetry.unconsumed_previous_path_x.size(); i++)
     {
-        next_x_vals.push_back(previous_path_x[i]);
-        next_y_vals.push_back(previous_path_y[i]);
+        next_x_vals.push_back(vehicle_telemetry.unconsumed_previous_path_x[i]);
+        next_y_vals.push_back(vehicle_telemetry.unconsumed_previous_path_y[i]);
     }
 
     //we now want to ensure that we maintain our target velocity, to do this we need to make sure the points are spaced apart at the appropriate distance
@@ -157,7 +157,7 @@ void Trajectory::compute_path()
     //fill in the rest of the points to get us to 50, we already populated the points left over from the last path plan
     //now we want to generate points on the new path until we get to 50 in total
     double previous_x = 0;
-    for (int i = 1; i <= (50 - previous_path_x.size()); i++)
+    for (int i = 1; i <= (50 - vehicle_telemetry.unconsumed_previous_path_x.size()); i++)
     {
         //current x point equals the last x point plus the distance increment that ensures we maintain our target velocity
         double x = previous_x + x_increment;

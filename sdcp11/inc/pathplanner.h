@@ -14,6 +14,8 @@
 #include <string>
 #include "json.hpp"
 #include "requestprocessor.h"
+#include "vehicletelemetry.h"
+#include "trajectory.h"
 #include "utility.h"
 
 //scoping
@@ -37,10 +39,16 @@ class PathPlanner : public RequestProcessor
     private:
         //utility class with helper functions
         Utility utility_;
+        //trajectory class to compute the vehicle's next path
+        Trajectory trajectory_;
         //map waypoints associated with highway in the simulator
         vector<Waypoint> map_waypoints_;
         //path to map waypoint data
         const string file_location_ = "../data/highway_map.csv";
+
+        //function declaration
+        //extract vehicle telemetry from json payload structure into VehicleTelemetry structure for easier handling
+        void extract_vehicle_telemetry(const json& telemetry_payload, VehicleTelemetry& vehicle_telemetry);
 };
 
 #endif /* PATHPLANNER_H */

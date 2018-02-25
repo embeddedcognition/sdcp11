@@ -11,6 +11,7 @@
 
 //includes
 #include "spline.h"
+#include "vehicletelemetry.h"
 
 //class declaration
 class Trajectory
@@ -22,8 +23,8 @@ class Trajectory
         virtual ~Trajectory();
 
         //function declaration
-        //get the next best state to be in
-        void compute_path();
+        //based on the behavioral guidance, compute a vehicle trajectory
+        void compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry, const vector<Waypoint>& map_waypoints);
 };
 
 #endif /* TRAJECTORY_H */

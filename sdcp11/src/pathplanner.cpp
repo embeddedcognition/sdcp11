@@ -25,34 +25,15 @@ json PathPlanner::compute_response_message_payload(const json& request_message_p
 {
     //local vars
     json response_message_payload;
+    VehicleTelemetry vehicle_telemetry;
 
-    //request_message_payload[1] is the data JSON object
+    //extract vehicle telemetry into more usable structure
+    //request_message_payload[1] is the json object containing the telemetry data from the message payload
+    //(request_message_payload[0] would contain the keyword "telemetry")
+    extract_vehicle_telemetry(request_message_payload[1], vehicle_telemetry);
 
-    // Main car's localization Data
-    double car_x = request_message_payload[1]["x"];
-    double car_y = request_message_payload[1]["y"];
-    double car_s = request_message_payload[1]["s"];
-    double car_d = request_message_payload[1]["d"];
-    double car_yaw = request_message_payload[1]["yaw"];
-    double car_speed = request_message_payload[1]["speed"];
-
-    //cout << "car_d: " << car_d << endl;
-
-    //cout << "map_waypoints length: " << map_waypoints.size() << endl;
-
-    // Previous path data given to the Planner
-    auto previous_path_x = request_message_payload[1]["previous_path_x"];
-    auto previous_path_y = request_message_payload[1]["previous_path_y"];
-    // Previous path's end s and d values
-    double end_path_s = request_message_payload[1]["end_path_s"];
-    double end_path_d = request_message_payload[1]["end_path_d"];
-
-    // Sensor Fusion Data, a list of all other cars on the same side of the road.
-    auto sensor_fusion = request_message_payload[1]["sensor_fusion"];
-
-
-
-
+    //compute the vehicle's next path
+    trajectory_.compute_vehicle_path(vehicle_telemetry, map_waypoints_);
 
     //package and send back json
 
@@ -64,4 +45,25 @@ json PathPlanner::compute_response_message_payload(const json& request_message_p
     response_message_payload["next_y"] = next_y_vals;
 
     return response_message_payload;
+}
+
+//function definition
+//extract vehicle telemetry from json payload structure into VehicleTelemetry structure for easier handling
+void PathPlanner::extract_vehicle_telemetry(const json& telemetry_payload, VehicleTelemetry& vehicle_telemetry)
+{
+    //extract vehicle telemetry data
+    //vehicle localization
+    vehicle_telemetry.x = telemetry_payload["x"];
+    vehicle_telemetry.y = telemetry_payload["y"];
+    vehicle_telemetry.s = telemetry_payload["s"];
+    vehicle_telemetry.d = telemetry_payload["d"];
+    vehicle_telemetry.yaw = telemetry_payload["yaw"];
+    vehicle_telemetry.speed = telemetry_payload["speed"];
+    //previous path
+    vehicle_telemetry.unconsumed_previous_path_x = telemetry_payload["previous_path_x"];
+    vehicle_telemetry.unconsumed_previous_path_y = telemetry_payload["previous_path_y"];
+    vehicle_telemetry.previous_path_ending_s = telemetry_payload["end_path_s"];
+    vehicle_telemetry.previous_path_ending_d = telemetry_payload["end_path_d"];
+    //sensor fusion
+    vehicle_telemetry.sensor_fusion = telemetry_payload["sensor_fusion"];
 }
