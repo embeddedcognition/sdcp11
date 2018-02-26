@@ -38,8 +38,8 @@ SimulatorServer::~SimulatorServer() {}
 void SimulatorServer::start(RequestProcessor& request_processor)
 {
     //local vars
-    const int tcp_listen_port = 4567;                                                        //port the micro websocket server will listen on
     Hub hub;                                                                                 //micro websocket hub class
+    const int tcp_listen_port = 4567;                                                        //port the micro websocket server will listen on
     function<void (WebSocket<SERVER>, char*, size_t, OpCode)> onMessage_lamda_func;          //lambda function for new message event
     function<void (WebSocket<SERVER>, HttpRequest)> onConnection_lamda_func;                 //lambda function for new connection event
     function<void (WebSocket<SERVER>, int, char*, size_t)> onDisconnection_lamda_func;       //lambda function for disconnect event
@@ -65,7 +65,7 @@ void SimulatorServer::start(RequestProcessor& request_processor)
             if (valid_message_payload_extracted(request_message, request_message_payload))
             {
                 //process request and return response
-                response_message_payload = request_processor.compute_response_message_payload(request_message_payload);
+                request_processor.compute_response_message_payload(request_message_payload, response_message_payload);
                 //format response message
                 response_message = "42[\"control\"," + response_message_payload.dump() +"]";
                 //send response message

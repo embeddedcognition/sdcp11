@@ -33,8 +33,8 @@ class PathPlanner : public RequestProcessor
         virtual ~PathPlanner();
 
         //function declaration
-        //process vehicle telemetry and return guidance/trajectory (this is an override of a purely virtual function defined in the superclass "TelemetryProcessor")
-        json compute_response_message_payload(const json& request_message_payload);
+        //process vehicle telemetry and return guidance/trajectory (this is an override of a purely virtual function defined in the superclass "RequestProcessor")
+        void compute_response_message_payload(const json& request_message_payload, json& response_message_payload);
 
     private:
         //utility class with helper functions

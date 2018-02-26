@@ -9,6 +9,12 @@
 #ifndef VEHICLETELEMETRY_H
 #define VEHICLETELEMETRY_H
 
+//includes
+#include <vector>
+
+//scoping
+using std::vector;
+
 //class declaration
 class VehicleTelemetry
 {

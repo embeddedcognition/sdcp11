@@ -6,9 +6,8 @@
 #######################################################
 */
 
+//includes
 #include "trajectory.h"
-
-using namespace std;
 
 //class definition
 //constructor
@@ -19,7 +18,7 @@ Trajectory::~Trajectory() {}
 
 //function definition
 //based on the behavioral guidance, compute a vehicle trajectory
-void Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry, const vector<Waypoint>& map_waypoints)
+vector<vector<double>> Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry, const vector<Waypoint>& map_waypoints)
 {
     //local vars
 
@@ -40,7 +39,7 @@ void Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry,
     //on the first iteration we'll not have a previous set of path points to extend upon so we need to start with the vehicle's current location
     double reference_x = vehicle_telemetry.x;
     double reference_y = vehicle_telemetry.y;
-    double reference_yaw = deg2rad(vehicle_telemetry.yaw);
+    double reference_yaw = utility_.convert_from_degrees_to_radians(vehicle_telemetry.yaw);
 
     //if the previous path size contains less then 2 points, we'll need to use the vehicle's position as a starting reference
     //we'll create a second point (previous to the vehicle's current position) based on the vehicle's current yaw
@@ -91,9 +90,9 @@ void Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry,
 
     //for our future path, we now plot 3 points into the future and use spline to fill in the gaps
     //convert the s and d values into an x/y coordinate
-    vector<double> next_xy_30 = getXY(vehicle_telemetry.s + 30, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-    vector<double> next_xy_60 = getXY(vehicle_telemetry.s + 60, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-    vector<double> next_xy_90 = getXY(vehicle_telemetry.s + 90, next_car_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+    vector<double> next_xy_30 = utility_.convert_from_frenet_to_cartesian(vehicle_telemetry.s + 30, next_car_d, map_waypoints);
+    vector<double> next_xy_60 = utility_.convert_from_frenet_to_cartesian(vehicle_telemetry.s + 60, next_car_d, map_waypoints);
+    vector<double> next_xy_90 = utility_.convert_from_frenet_to_cartesian(vehicle_telemetry.s + 90, next_car_d, map_waypoints);
 
     //push the spaced future points onto the vectors
     //x (spline requires that points are sorted)
@@ -148,7 +147,7 @@ void Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry,
     //compute the distance from the horizon point on the spline to the vehicle's current position, remember the vehicle is at zero degrees (yaw) and it's position is at
     //the origin given our previous coordinate transformation, so no need to subtract the vehicle's position in the distance equation (since it's at zero anyway), we just square the position
     //of the horizon point at x and y
-    double distance_to_horizon_point = distance(0, 0, horizon_x, horizon_y);
+    double distance_to_horizon_point = utility_.compute_distance_between_points(0, 0, horizon_x, horizon_y);
     //now that we have the the distance, we can compute N (the number of pieces, spaced far enough apart to maintain our target velocity)
     double N = distance_to_horizon_point / (0.02 * (reference_velocity / 2.24)); //reference velocity is in mph and we need that to be in meters per second so we divide by 2.24
     //increments x by a value that ensures appropriate spacing to maintain velocity
@@ -194,4 +193,6 @@ void Trajectory::compute_vehicle_path(const VehicleTelemetry& vehicle_telemetry,
         next_y_vals.push_back(xy[1]);
     }
     */
+
+    return {next_x_vals, next_y_vals};
 }

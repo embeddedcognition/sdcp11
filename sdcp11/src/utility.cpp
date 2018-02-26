@@ -9,6 +9,7 @@
 //includes
 #include <fstream>
 #include <sstream>
+#include <math.h>
 #include "utility.h"
 
 //scoping
@@ -72,4 +73,46 @@ void Utility::load_map_waypoints(vector<Waypoint>& map_waypoints, const string& 
         cout << "First line - x: " << (map_waypoints.front()).x << endl;
         cout << "Last line - x: " << (map_waypoints.back()).x << endl;
     }
+}
+
+//function definition
+//convert degrees to radians
+double Utility::convert_from_degrees_to_radians(const double degrees)
+{
+    return (degrees * M_PI) / 180;
+}
+
+//function definition
+//convert frenet to cartesian
+vector<double> Utility::convert_from_frenet_to_cartesian(double s, double d, const vector<Waypoint>& map_waypoints)
+{
+    int prev_wp = -1;
+
+    while(s > map_waypoints[prev_wp+1].s && (prev_wp < (int)(map_waypoints.size()-1) ))
+    {
+        prev_wp++;
+    }
+
+    int wp2 = (prev_wp+1)%map_waypoints.size();
+
+    double heading = atan2((map_waypoints[wp2].y - map_waypoints[prev_wp].y), (map_waypoints[wp2].x - map_waypoints[prev_wp].x));
+    // the x,y,s along the segment
+    double seg_s = (s - map_waypoints[prev_wp].s);
+
+    double seg_x = map_waypoints[prev_wp].x + (seg_s * cos(heading));
+    double seg_y = map_waypoints[prev_wp].y + (seg_s * sin(heading));
+
+    double perp_heading = heading - (M_PI / 2);
+
+    double x = seg_x + (d * cos(perp_heading));
+    double y = seg_y + (d * sin(perp_heading));
+
+    return {x,y};
+}
+
+//function definition
+//compute distance between two points
+double Utility::compute_distance_between_points(double x1, double y1, double x2, double y2)
+{
+    return sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
 }

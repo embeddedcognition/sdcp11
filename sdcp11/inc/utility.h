@@ -34,6 +34,18 @@ class Utility
         //function declaration
         //load the map waypoint data for the highway
         void load_map_waypoints(vector<Waypoint>& map_waypoints, const string& file_location);
+
+        //function declaration
+        //convert degrees to radians
+        double convert_from_degrees_to_radians(const double degrees);
+
+        //function declaration
+        //convert frenet to cartesian
+        vector<double> convert_from_frenet_to_cartesian(double s, double d, const vector<Waypoint>& map_waypoints);
+
+        //function declaration
+        //compute distance between two points
+        double compute_distance_between_points(double x1, double y1, double x2, double y2);
 };
 
 #endif /* UTILITY_H */
