@@ -14,15 +14,15 @@
 #include "pathplanner.h"
 
 //function declarations
-int main(const int, const char**);
+void main(const int, const char**);
 
 //function definition
 //main thread of execution
-int main(const int argc, const char** argv)
+void main(const int argc, const char** argv)
 {
     //local vars
-    SimulatorServer simulator_server;
-    PathPlanner path_planner;
+    SimulatorServer simulator_server;   //communication agent between the Udacity simulator and the path planner module
+    PathPlanner path_planner;           //path planning module (receives telemetry and returns a trajectory)
 
     // The max s value before wrapping around the track back to 0
     //double max_s = 6945.554;
@@ -30,6 +30,4 @@ int main(const int argc, const char** argv)
     //start the simulator server, to listen for Udacity simulator connections,
     //once connected forward telemetry to the path planner and have it return back trajectories to the simulator
     simulator_server.start(path_planner);
-
-    return 0;
 }
