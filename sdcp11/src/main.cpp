@@ -15,11 +15,11 @@
 #include "pathplanner.h"
 
 //function declarations
-int main(const int, const char**);
+int main(const int, const char* []);
 
 //function definition
 //main thread of execution
-int main(const int argc, const char** argv)
+int main(const int argc, const char* argv[])
 {
     //local vars
     SimulatorServer simulator_server;   //communication agent between the Udacity simulator and the path planner module
