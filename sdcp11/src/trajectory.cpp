@@ -39,7 +39,7 @@ vector<vector<double>> Trajectory::compute_vehicle_path(const VehicleTelemetry& 
     //on the first iteration we'll not have a previous set of path points to extend upon so we need to start with the vehicle's current location
     double reference_x = vehicle_telemetry.x;
     double reference_y = vehicle_telemetry.y;
-    double reference_yaw = utility_.convert_from_degrees_to_radians(vehicle_telemetry.yaw);
+    double reference_yaw = utility_.convert_degrees_to_radians(vehicle_telemetry.yaw);
 
     //if the previous path size contains less then 2 points, we'll need to use the vehicle's position as a starting reference
     //we'll create a second point (previous to the vehicle's current position) based on the vehicle's current yaw
@@ -90,9 +90,9 @@ vector<vector<double>> Trajectory::compute_vehicle_path(const VehicleTelemetry& 
 
     //for our future path, we now plot 3 points into the future and use spline to fill in the gaps
     //convert the s and d values into an x/y coordinate
-    vector<double> next_xy_30 = utility_.convert_from_frenet_to_cartesian(vehicle_telemetry.s + 30, next_car_d, map_waypoints);
-    vector<double> next_xy_60 = utility_.convert_from_frenet_to_cartesian(vehicle_telemetry.s + 60, next_car_d, map_waypoints);
-    vector<double> next_xy_90 = utility_.convert_from_frenet_to_cartesian(vehicle_telemetry.s + 90, next_car_d, map_waypoints);
+    vector<double> next_xy_30 = utility_.convert_frenet_to_cartesian(vehicle_telemetry.s + 30, next_car_d, map_waypoints);
+    vector<double> next_xy_60 = utility_.convert_frenet_to_cartesian(vehicle_telemetry.s + 60, next_car_d, map_waypoints);
+    vector<double> next_xy_90 = utility_.convert_frenet_to_cartesian(vehicle_telemetry.s + 90, next_car_d, map_waypoints);
 
     //push the spaced future points onto the vectors
     //x (spline requires that points are sorted)

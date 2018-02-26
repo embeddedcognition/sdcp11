@@ -77,23 +77,23 @@ void Utility::load_map_waypoints(vector<Waypoint>& map_waypoints, const string& 
 
 //function definition
 //convert degrees to radians
-double Utility::convert_from_degrees_to_radians(const double degrees)
+double Utility::convert_degrees_to_radians(const double degrees)
 {
     return (degrees * M_PI) / 180;
 }
 
 //function definition
 //convert frenet to cartesian
-vector<double> Utility::convert_from_frenet_to_cartesian(double s, double d, const vector<Waypoint>& map_waypoints)
+vector<double> Utility::convert_frenet_to_cartesian(double s, double d, const vector<Waypoint>& map_waypoints)
 {
     int prev_wp = -1;
 
-    while(s > map_waypoints[prev_wp+1].s && (prev_wp < (int)(map_waypoints.size()-1) ))
+    while(s > map_waypoints[prev_wp+1].s && (prev_wp < (int)(map_waypoints.size() - 1) ))
     {
         prev_wp++;
     }
 
-    int wp2 = (prev_wp+1)%map_waypoints.size();
+    int wp2 = (prev_wp + 1) % map_waypoints.size();
 
     double heading = atan2((map_waypoints[wp2].y - map_waypoints[prev_wp].y), (map_waypoints[wp2].x - map_waypoints[prev_wp].x));
     // the x,y,s along the segment

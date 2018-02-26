@@ -37,11 +37,11 @@ class Utility
 
         //function declaration
         //convert degrees to radians
-        double convert_from_degrees_to_radians(const double degrees);
+        double convert_degrees_to_radians(const double degrees);
 
         //function declaration
         //convert frenet to cartesian
-        vector<double> convert_from_frenet_to_cartesian(double s, double d, const vector<Waypoint>& map_waypoints);
+        vector<double> convert_frenet_to_cartesian(double s, double d, const vector<Waypoint>& map_waypoints);
 
         //function declaration
         //compute distance between two points
