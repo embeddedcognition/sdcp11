@@ -21,5 +21,5 @@ Behavior::~Behavior() {}
 //get the next best state to be in
 void Behavior::get_next_state()
 {
-    //local vars
+    //local vars of mine
 }
